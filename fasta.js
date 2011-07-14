@@ -2,7 +2,8 @@ var last = 42, A = 3877, C = 29573, M = 139968;
 
 function rand(max) {
   last = (last * A + C) % M;
-  return max * last / M;
+  //return max * last / M;
+  return last;
 }
 
 var ALU =
@@ -55,16 +56,22 @@ function fastaRepeat(n, seq) {
 function fastaRandom(n, table) {
   var line = new Array(60);
   makeCumulative(table);
+  var lookup = {};
+  for( var x=0; x < M; x++ ) {
+    var div = x / M;
+    for( var c in table ) {
+       if( div < table[c] ) {
+        lookup[x] = c;
+        break;
+       }
+    }
+  }
+  //print( JSON.stringify( lookup ) );
   while (n>0) {
     if (n<line.length) line = new Array(n);
     for (var i=0; i<line.length; i++) {
       var r = rand(1);
-      for (var c in table) {
-        if (r < table[c]) {
-          line[i] = c;
-          break;
-        }
-      }
+      line[i] = lookup[ r ];
     }
     print( line.join('') );
     n -= line.length;
@@ -79,4 +86,5 @@ print(">TWO IUB ambiguity codes")
 fastaRandom(3*n, IUB)
 print(">THREE Homo sapiens frequency")
 fastaRandom(5*n, HomoSap)
+
 
